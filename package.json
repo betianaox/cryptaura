@@ -1,0 +1,16 @@
+{
+  "name": "cryptaura",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start -w @cryptaura/mobile",
+    "test": "npm run test -w @cryptaura/core -w @cryptaura/feeds",
+    "typecheck": "tsc -p packages/core --noEmit && tsc -p packages/feeds --noEmit && tsc -p packages/ui --noEmit && npm run typecheck -w @cryptaura/mobile"
+  },
+  "devDependencies": {
+    "vitest": "^5.1.0"
+  }
+}

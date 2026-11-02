@@ -1,0 +1,14 @@
+{
+  "name": "@cryptaura/feeds",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fuentes de datos de mercado",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cryptaura/core": "*"
+  }
+}
