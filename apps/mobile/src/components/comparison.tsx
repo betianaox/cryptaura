@@ -2,9 +2,11 @@ import { crossExchangeGap, formatPrice, type ExchangeId, type Ticker } from '@cr
 import { Card, Pill, Txt, spacing, useTheme } from '@cryptaura/ui';
 import { StyleSheet, View } from 'react-native';
 
+import { fill, useI18n } from '@/i18n';
+
 const NAMES: Record<ExchangeId, string> = { kraken: 'Kraken', coinbase: 'Coinbase', binance: 'Binance' };
 
-/** El mismo par en varios exchanges: precio, compra, venta y diferencia. */
+/** El mismo par en varios exchanges: compra, venta, último y diferencia. */
 export function ExchangeComparison({
   kraken,
   others,
@@ -15,60 +17,56 @@ export function ExchangeComparison({
   unavailable: ExchangeId[];
 }) {
   const theme = useTheme();
+  const { t, locale } = useI18n();
   const all = [...(kraken ? [kraken] : []), ...others];
   const gap = crossExchangeGap(all);
   return (
     <Card>
       <View style={styles.header}>
-        <Txt variant="label">Across exchanges</Txt>
+        <Txt variant="label">{t.market.across}</Txt>
         {gap ? (
-          <Pill label={`Gap ${gap.gapPct.toFixed(3)}%`} tone={gap.gapPct > 0.5 ? 'down' : 'neutral'} />
+          <Pill
+            label={fill(t.market.gap, { v: `${gap.gapPct.toFixed(3)}%` })}
+            tone={gap.gapPct > 0.5 ? 'down' : 'neutral'}
+          />
         ) : null}
       </View>
       <View style={styles.row}>
         <Txt variant="small" style={styles.col}>
-          Exchange
+          {t.market.exchange}
         </Txt>
         <Txt variant="small" style={styles.num}>
-          Bid
+          {t.market.bid}
         </Txt>
         <Txt variant="small" style={styles.num}>
-          Ask
+          {t.market.ask}
         </Txt>
         <Txt variant="small" style={styles.num}>
-          Last
+          {t.market.last}
         </Txt>
       </View>
-      {all.map((t) => (
-        <View key={t.exchange} style={styles.row}>
+      {all.map((tk) => (
+        <View key={tk.exchange} style={styles.row}>
           <Txt variant="small" style={[styles.col, { color: theme.text }]}>
-            {NAMES[t.exchange]}
+            {NAMES[tk.exchange]}
           </Txt>
-          <Txt
-            variant="small"
-            numeric
-            style={[styles.num, { color: gap?.bestBid.exchange === t.exchange ? theme.up : theme.text }]}
-          >
-            {formatPrice(t.bid)}
+          <Txt variant="small" numeric style={[styles.num, { color: gap?.bestBid.exchange === tk.exchange ? theme.up : theme.text }]}>
+            {formatPrice(tk.bid, locale)}
           </Txt>
-          <Txt
-            variant="small"
-            numeric
-            style={[styles.num, { color: gap?.bestAsk.exchange === t.exchange ? theme.up : theme.text }]}
-          >
-            {formatPrice(t.ask)}
+          <Txt variant="small" numeric style={[styles.num, { color: gap?.bestAsk.exchange === tk.exchange ? theme.up : theme.text }]}>
+            {formatPrice(tk.ask, locale)}
           </Txt>
           <Txt variant="small" numeric style={[styles.num, { color: theme.text }]}>
-            {formatPrice(t.last)}
+            {formatPrice(tk.last, locale)}
           </Txt>
         </View>
       ))}
       {unavailable.map((exchange) => (
         <Txt key={exchange} variant="small">
-          {NAMES[exchange]}: not available for this pair or region.
+          {fill(t.market.unavailable, { name: NAMES[exchange] })}
         </Txt>
       ))}
-      <Txt variant="small">Binance is compared against USDT pairs. Highlighted: best bid and best ask.</Txt>
+      <Txt variant="small">{t.market.acrossNote}</Txt>
     </Card>
   );
 }

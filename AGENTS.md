@@ -6,6 +6,8 @@ App de datos de mercado cripto en tiempo real (solo información, sin trading). 
 - `core` y `feeds` no dependen de React: los va a usar también el backend. Todo cambio en el libro de órdenes, la reconexión o los adaptadores lleva test (Vitest).
 - Las pantallas solo conocen el modelo común de `@cryptaura/core`, nunca los mensajes de un exchange.
 - Los datos en vivo se guardan con `useThrottledState`: nunca un `setState` por mensaje.
+- Todo texto visible va en `apps/mobile/src/i18n` (en, es y pt; español neutro, sin voseo) y todo color sale del tema (claro y oscuro).
+- Lo que todavía no tiene backend vive en `apps/mobile/src/services/api.ts` con datos de ejemplo, y la pantalla lo marca como "Datos de ejemplo".
 - La app nunca recomienda comprar o vender. El aviso de "no es asesoramiento financiero" tiene que estar visible.
 - Antes de dar algo por terminado: `npm test` y `npm run typecheck` desde la raíz.
 

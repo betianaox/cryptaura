@@ -10,6 +10,7 @@ import {
   type Trade,
 } from '@cryptaura/core';
 
+import type { BookUpdate, MarketFeed } from '../feed';
 import { ReconnectingSocket, type SocketFactory } from '../reconnecting-socket';
 import { KrakenBook } from './book';
 import {
@@ -27,13 +28,6 @@ import {
   type KrakenSubscribeParams,
 } from './protocol';
 
-export interface BookUpdate {
-  book: OrderBook;
-  /** null mientras no se conoce la precisión del instrumento para verificar. */
-  checksumOk: boolean | null;
-  /** Cuántas veces se pidió un snapshot nuevo por checksum incorrecto. */
-  resyncs: number;
-}
 
 interface Subscription {
   params: KrakenSubscribeParams;
@@ -58,7 +52,7 @@ const MAX_CANDLES = 720;
  *   desuscribe cuando se va el último que escucha.
  * - Al reconectar se vuelven a mandar todas las suscripciones activas.
  */
-export class KrakenFeed {
+export class KrakenFeed implements MarketFeed {
   private readonly socket: ReconnectingSocket;
   private readonly subs = new Map<string, Subscription>();
   private readonly books = new Map<string, BookState>();

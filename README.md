@@ -4,7 +4,16 @@ Real-time crypto market data for Android: live prices, order book, trades, candl
 
 **Information only.** Cryptaura doesn't trade, hold funds or connect to exchange accounts. Not financial advice.
 
-> Estado: **fase 0**. La app ya muestra mercados y el detalle de un par en vivo desde la WebSocket pública de Kraken, con el libro de órdenes verificado por checksum y la comparación con Coinbase y Binance. Las decisiones están en [`docs/arquitectura.md`](docs/arquitectura.md).
+> Estado: **app completa, backend pendiente**. Mercados y detalle en vivo desde la WebSocket pública de Kraken, panorama del mercado, alertas, simulador de trading y ajustes, con tema claro y oscuro y en inglés, español y portugués. Lo que depende del backend usa datos de ejemplo marcados como tales. Las decisiones están en [`docs/arquitectura.md`](docs/arquitectura.md).
+
+## Pantallas
+
+- **Mercados**: lista en vivo con favoritos, buscador y orden por suba, baja o volumen.
+- **Detalle de un par**: velas con volumen en 6 intervalos, resumen del mercado, libro de órdenes verificado con checksum y su desequilibrio, gráfico de profundidad, comparación entre exchanges y operaciones recientes. Favorito, crear alerta y simular operación.
+- **Panorama**: resumen del día, índice de miedo y codicia, capitalización, dominancia, stablecoins, mayores movimientos y titulares.
+- **Alertas**: precio por encima o por debajo, movimiento de 24 h y spread, con historial de las que se dispararon.
+- **Simulador**: cuenta ficticia de USD 10.000, órdenes de mercado y límite contra precios reales, posiciones con resultado e historial.
+- **Ajustes**: tema (sistema, claro u oscuro), idioma, fuente de datos (Kraken en vivo o demo), aviso legal y borrar datos.
 
 ## Qué tiene de interesante (técnicamente)
 
@@ -13,7 +22,8 @@ Real-time crypto market data for Android: live prices, order book, trades, candl
 - **Una conexión, muchas pantallas**: suscripciones con conteo de referencias; se escucha solo lo que está a la vista.
 - **Redibujado controlado**: los datos llegan cientos de veces por segundo y la interfaz se actualiza entre 2 y 8 veces por segundo según el componente.
 - **Modelo normalizado**: cada exchange tiene un adaptador hacia un modelo común; sumar uno es escribir un adaptador.
-- **Lógica sin React y con tests**: `core` y `feeds` se testean con Vitest y los va a usar también el backend.
+- **Lógica sin React y con tests**: el libro, la reconexión, las alertas y el simulador viven en `core` y `feeds`, se testean con Vitest y los va a usar también el backend.
+- **Fuentes intercambiables**: Kraken y una fuente demo cumplen la misma interfaz `MarketFeed`.
 
 ## Estructura
 

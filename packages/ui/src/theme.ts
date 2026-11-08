@@ -1,8 +1,9 @@
 import { createContext, useContext } from 'react';
 import { useColorScheme } from 'react-native';
 
-// Tema de Cryptaura. Oscuro por defecto: es como se leen los datos de mercado
-// durante horas. Ningún componente usa colores fijos: todos leen el tema.
+// Tema de Cryptaura: claro y oscuro, con el dorado del logo como acento.
+// Sigue al sistema salvo que se elija uno en Ajustes. Ningún componente usa
+// colores fijos: todos leen el tema.
 
 export interface Theme {
   mode: 'dark' | 'light';
@@ -19,6 +20,8 @@ export interface Theme {
   down: string;
   upSoft: string;
   downSoft: string;
+  warning: string;
+  accentSoft: string;
 }
 
 export const darkTheme: Theme = {
@@ -29,12 +32,14 @@ export const darkTheme: Theme = {
   border: '#232B3B',
   text: '#E8ECF3',
   textMuted: '#8A94A7',
-  accent: '#7C5CFF',
-  onAccent: '#FFFFFF',
+  accent: '#F5AB01',
+  onAccent: '#0B0E14',
   up: '#2BD48F',
   down: '#FF5C7A',
   upSoft: 'rgba(43, 212, 143, 0.14)',
   downSoft: 'rgba(255, 92, 122, 0.14)',
+  warning: '#F5B544',
+  accentSoft: 'rgba(245, 171, 1, 0.14)',
 };
 
 export const lightTheme: Theme = {
@@ -45,12 +50,14 @@ export const lightTheme: Theme = {
   border: '#E1E5EE',
   text: '#0E1320',
   textMuted: '#5D6679',
-  accent: '#5B3FE0',
+  accent: '#C48000',
   onAccent: '#FFFFFF',
   up: '#0E9F6E',
   down: '#E0335A',
   upSoft: 'rgba(14, 159, 110, 0.12)',
   downSoft: 'rgba(224, 51, 90, 0.12)',
+  warning: '#B7791F',
+  accentSoft: 'rgba(196, 128, 0, 0.12)',
 };
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;

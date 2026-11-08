@@ -2,7 +2,8 @@ import { crc32 } from '@cryptaura/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { checksumNumber, KrakenBook } from './kraken/book';
-import { KrakenFeed, type BookUpdate } from './kraken/client';
+import type { BookUpdate } from './feed';
+import { KrakenFeed } from './kraken/client';
 import { ReconnectingSocket, type SocketLike } from './reconnecting-socket';
 import { fetchComparison, marketToBinanceSymbol, marketToCoinbaseSymbol } from './rest-tickers';
 
@@ -250,5 +251,29 @@ describe('comparación entre exchanges', () => {
     expect(unavailable).toEqual(['binance']);
     expect(tickers[0]).toMatchObject({ exchange: 'coinbase', last: 100, bid: 99, ask: 101 });
     expect(tickers[0]!.changePct24h).toBeCloseTo((10 / 90) * 100, 6);
+  });
+});
+
+describe('fuente demo', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('cumple la misma interfaz con datos coherentes', async () => {
+    vi.useFakeTimers();
+    const { DemoFeed } = await import('./demo');
+    const feed = new DemoFeed({ tickMs: 100 });
+    const tickers: number[] = [];
+    let book: BookUpdate | null = null;
+    let candles = 0;
+    feed.subscribeTickers(['BTC/USD'], (t) => tickers.push(t.last));
+    feed.subscribeBook('BTC/USD', 10, (u) => (book = u));
+    feed.subscribeCandles('BTC/USD', '1h', (c) => (candles = c.length));
+    vi.advanceTimersByTime(1000);
+    expect(tickers.length).toBeGreaterThan(5);
+    expect(candles).toBe(120);
+    const b = (book as BookUpdate | null)!;
+    expect(b.book.bids[0]!.price).toBeLessThan(b.book.asks[0]!.price);
+    expect(b.book.bids.map((l) => l.price)).toEqual([...b.book.bids.map((l) => l.price)].sort((x, y) => y - x));
+    expect(b.book.asks.map((l) => l.price)).toEqual([...b.book.asks.map((l) => l.price)].sort((x, y) => x - y));
+    feed.stop();
   });
 });

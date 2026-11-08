@@ -1,8 +1,26 @@
 import type { MarketId } from '@cryptaura/core';
-import { KrakenFeed } from '@cryptaura/feeds';
+import { DemoFeed, KrakenFeed, type MarketFeed } from '@cryptaura/feeds';
 
-/** Una sola conexión a Kraken para toda la app. Se abre con la primera suscripción. */
-export const kraken = new KrakenFeed();
+import { useSettings } from '@/state/store';
+
+/**
+ * Las dos fuentes posibles. Se crean una sola vez y cada una abre su conexión
+ * (o su simulación) recién con la primera suscripción.
+ */
+const feeds: Record<'live' | 'demo', MarketFeed> = {
+  live: new KrakenFeed(),
+  demo: new DemoFeed(),
+};
+
+/** La fuente elegida en Ajustes. Cambiarla hace que las pantallas se vuelvan a suscribir. */
+export function useFeed(): MarketFeed {
+  const source = useSettings((s) => s.source);
+  return feeds[source];
+}
+
+export function useIsDemo(): boolean {
+  return useSettings((s) => s.source) === 'demo';
+}
 
 /**
  * Pares de la lista inicial. Más adelante salen del backend (los de mayor
@@ -24,3 +42,19 @@ export const DEFAULT_MARKETS: MarketId[] = [
   'USDT/USD',
   'USDC/USD',
 ];
+
+/** Nombres para mostrar. Después vienen de CoinGecko por el backend. */
+export const ASSET_NAMES: Record<string, string> = {
+  BTC: 'Bitcoin',
+  ETH: 'Ethereum',
+  SOL: 'Solana',
+  XRP: 'XRP',
+  ADA: 'Cardano',
+  DOGE: 'Dogecoin',
+  LINK: 'Chainlink',
+  DOT: 'Polkadot',
+  AVAX: 'Avalanche',
+  LTC: 'Litecoin',
+  USDT: 'Tether',
+  USDC: 'USD Coin',
+};

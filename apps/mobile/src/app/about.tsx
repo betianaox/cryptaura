@@ -1,33 +1,34 @@
 import { Card, Txt, spacing } from '@cryptaura/ui';
 import { ScrollView, StyleSheet } from 'react-native';
 
-const SOURCES = [
-  ['Kraken', 'Live prices, order book, trades and candles (public WebSocket API v2).'],
-  ['Coinbase', 'Price comparison (public market data).'],
-  ['Binance', 'Price comparison (public market data endpoints).'],
-] as const;
+import { useI18n } from '@/i18n';
 
-/** Fuentes de datos, atribuciones y aviso. */
+/** Fuentes de datos, atribuciones, privacidad y aviso. */
 export default function AboutScreen() {
+  const { t } = useI18n();
+  const sources = [
+    ['Kraken', t.about.kraken],
+    ['Coinbase', t.about.coinbase],
+    ['Binance', t.about.binance],
+    ['alternative.me', t.about.alternative],
+  ] as const;
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <Card>
-        <Txt variant="title">Not financial advice</Txt>
-        <Txt variant="muted">
-          Cryptaura shows public market data for information purposes only. It does not buy, sell or hold
-          assets, and nothing in the app is a recommendation to trade.
-        </Txt>
+        <Txt variant="title">{t.about.title}</Txt>
+        <Txt variant="muted">{t.about.body}</Txt>
       </Card>
       <Card>
-        <Txt variant="title">Data sources</Txt>
-        {SOURCES.map(([name, use]) => (
+        <Txt variant="title">{t.about.sources}</Txt>
+        {sources.map(([name, use]) => (
           <Txt key={name} variant="muted">
             <Txt variant="label">{name}</Txt> — {use}
           </Txt>
         ))}
-        <Txt variant="small">
-          Cryptaura is an independent app and is not affiliated with or endorsed by any exchange.
-        </Txt>
+        <Txt variant="small">{t.about.independent}</Txt>
+      </Card>
+      <Card>
+        <Txt variant="muted">{t.about.privacy}</Txt>
       </Card>
     </ScrollView>
   );

@@ -1,6 +1,6 @@
 # Cryptaura — documento de decisiones
 
-> Estado: **planteo y estructura inicial**. Este documento reúne las decisiones de producto y de arquitectura. Se actualiza a medida que el proyecto avanza.
+> Estado: **app completa con datos en vivo de Kraken y una fuente demo**. Todo lo que depende del backend (panorama, titulares, resúmenes con IA, notificaciones push) está maquetado con datos de ejemplo detrás de la misma interfaz que va a tener la API, y la app lo marca como tal. Este documento reúne las decisiones de producto y de arquitectura y se actualiza a medida que el proyecto avanza.
 
 ## 1. Qué es
 
@@ -213,6 +213,29 @@ Todo entra en los planes gratuitos al principio:
 - **Pruebas cerradas** antes de producción, como las otras apps.
 
 ## 10. Plan de trabajo
+
+| Fase | Estado |
+|---|---|
+| 0. Estructura | Hecha |
+| 1. Mercado completo | Hecha: velas con volumen, profundidad, favoritos, buscador y comparación (Coinbase y Binance por REST) |
+| 2. Alertas | App hecha (se evalúan con la app abierta). Falta el backend para avisar con la app cerrada |
+| 3. Panorama e IA | Pantallas hechas con datos de ejemplo y un resumen armado por reglas con los datos en vivo. Falta la ingesta y Gemini |
+| 4. Simulador | Hecho, con órdenes de mercado y límite |
+| 5. Publicación | Pendiente |
+
+### 10.1 Lo que todavía no está conectado
+
+- `apps/mobile/src/services/api.ts`: panorama (miedo y codicia, capitalización, dominancia, stablecoins) y titulares. Devuelve datos fijos con la forma de la API real.
+- `apps/mobile/src/lib/brief.ts`: el resumen del mercado se arma con reglas a partir de los datos en vivo. Gemini va a recibir esos mismos datos ya calculados.
+- Las alertas viven en el teléfono y se evalúan con `shouldTrigger` de `@cryptaura/core`, la misma función que va a usar la Lambda `alerts`.
+
+### 10.2 Fuente demo
+
+`DemoFeed` (en `@cryptaura/feeds`) simula el mercado con caminatas aleatorias y cumple la misma interfaz `MarketFeed` que el cliente de Kraken. Se elige en Ajustes: sirve sin red, en el emulador y para las capturas.
+
+
+### 10.3 Plan original
+
 
 | Fase | Qué incluye |
 |---|---|

@@ -1,27 +1,31 @@
-import { formatPrice, formatQty, spread, type BookLevel } from '@cryptaura/core';
+import { bookImbalance, formatPrice, formatQty, spread, type BookLevel } from '@cryptaura/core';
 import type { BookUpdate } from '@cryptaura/feeds';
 import { Card, Pill, Txt, spacing, useTheme } from '@cryptaura/ui';
 import { StyleSheet, View } from 'react-native';
 
+import { fill, useI18n } from '@/i18n';
+
 /** Libro de órdenes con barras de profundidad acumulada. */
-export function OrderBookView({ update }: { update: BookUpdate | null }) {
+export function OrderBookView({ update, rows = 10 }: { update: BookUpdate | null; rows?: number }) {
   const theme = useTheme();
+  const { t, locale } = useI18n();
   if (!update) {
     return (
       <Card>
-        <Txt variant="label">Order book</Txt>
-        <Txt variant="muted">Loading…</Txt>
+        <Txt variant="label">{t.market.orderBook}</Txt>
+        <Txt variant="muted">{t.common.loading}</Txt>
       </Card>
     );
   }
   const { book, checksumOk, resyncs } = update;
-  const asks = book.asks.slice(0, 10);
-  const bids = book.bids.slice(0, 10);
+  const asks = book.asks.slice(0, rows);
+  const bids = book.bids.slice(0, rows);
   const total = (levels: BookLevel[]) => levels.reduce((acc, l) => acc + l.qty, 0);
   const max = Math.max(total(asks), total(bids), Number.EPSILON);
   const s = spread(book);
+  const imbalance = bookImbalance(book, rows);
 
-  const rows = (levels: BookLevel[], side: 'ask' | 'bid') => {
+  const levelRows = (levels: BookLevel[], side: 'ask' | 'bid') => {
     let acc = 0;
     return levels.map((level) => {
       acc += level.qty;
@@ -31,10 +35,10 @@ export function OrderBookView({ update }: { update: BookUpdate | null }) {
         <View key={`${side}-${level.price}`} style={styles.level}>
           <View style={[styles.bar, { width: `${(acc / max) * 100}%`, backgroundColor: soft }]} />
           <Txt variant="small" numeric style={{ color, flex: 1 }}>
-            {formatPrice(level.price)}
+            {formatPrice(level.price, locale)}
           </Txt>
           <Txt variant="small" numeric style={{ color: theme.text }}>
-            {formatQty(level.qty)}
+            {formatQty(level.qty, locale)}
           </Txt>
         </View>
       );
@@ -44,21 +48,30 @@ export function OrderBookView({ update }: { update: BookUpdate | null }) {
   return (
     <Card>
       <View style={styles.header}>
-        <Txt variant="label">Order book</Txt>
+        <Txt variant="label">{t.market.orderBook}</Txt>
         {checksumOk === true ? (
-          <Pill label={resyncs > 0 ? `Checksum ✓ · ${resyncs} resync` : 'Checksum ✓'} tone="up" />
+          <Pill
+            label={resyncs > 0 ? `${t.market.checksumOk} · ${fill(t.market.resyncs, { n: resyncs })}` : t.market.checksumOk}
+            tone="up"
+          />
         ) : (
-          <Pill label="Verifying…" />
+          <Pill label={t.market.verifying} />
         )}
       </View>
-      <View>{rows([...asks].reverse(), 'ask')}</View>
+      <View>{levelRows([...asks].reverse(), 'ask')}</View>
       <View style={[styles.spread, { borderColor: theme.border }]}>
-        <Txt variant="small">Spread</Txt>
+        <Txt variant="small">{t.market.spread}</Txt>
         <Txt variant="small" numeric>
-          {s ? `${formatPrice(s.absolute)} (${s.pct.toFixed(3)}%)` : '—'}
+          {s ? `${formatPrice(s.absolute, locale)} (${s.pct.toFixed(3)}%)` : '—'}
         </Txt>
       </View>
-      <View>{rows(bids, 'bid')}</View>
+      <View>{levelRows(bids, 'bid')}</View>
+      <View style={styles.imbalance}>
+        <Txt variant="small">{t.market.imbalance}</Txt>
+        <View style={[styles.imbalanceTrack, { backgroundColor: theme.downSoft }]}>
+          <View style={{ width: `${((imbalance + 1) / 2) * 100}%`, backgroundColor: theme.up, height: '100%', borderRadius: 3 }} />
+        </View>
+      </View>
     </Card>
   );
 }
@@ -76,4 +89,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginVertical: spacing.xs,
   },
+  imbalance: { gap: spacing.xs, marginTop: spacing.xs },
+  imbalanceTrack: { height: 6, borderRadius: 3, overflow: 'hidden' },
 });
